@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { BranchDetector } from './branchDetector';
 import { StatusBarDisplay } from './statusBarDisplay';
-import { sendBannerToTerminal } from './terminalDisplay';
+import { showGachaScreen } from './gachaPanel';
 import { getOrAssignRarity, clearAllRarities } from './rarityEngine';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext): void {
   detector.onNewBranch(event => {
     const { record, isNew } = getOrAssignRarity(event.branchName, context.globalState);
 
-    // Common branches are silent — no banner, no notification, no status bar
+    // Common branches are silent
     if (record.rarity === 'common') return;
 
     const config = vscode.workspace.getConfiguration('branchRarity');
@@ -24,20 +24,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     if (isNew) {
-      sendBannerToTerminal(event.branchName, record.rarity);
-
-      const name = event.branchName;
-      switch (record.rarity) {
-        case 'uncommon':
-          vscode.window.showInformationMessage(`✦ Uncommon branch: ${name}`);
-          break;
-        case 'rare':
-          vscode.window.showWarningMessage(`★★ Rare branch discovered: ${name}`);
-          break;
-        case 'legendary':
-          vscode.window.showErrorMessage(`🔥 LEGENDARY branch discovered: ${name}`);
-          break;
-      }
+      showGachaScreen(event.branchName, record.rarity);
     }
   });
 
