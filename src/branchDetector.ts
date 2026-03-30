@@ -31,18 +31,24 @@ export class BranchDetector implements vscode.Disposable {
     const watcher = vscode.workspace.createFileSystemWatcher(headPattern);
     this._disposables.push(watcher);
 
-    const onHeadChange = async (uri: vscode.Uri) => {
-      this.log.appendLine(`[detector] .git/HEAD changed: ${uri.fsPath}`);
-      try {
-        const raw = await vscode.workspace.fs.readFile(uri);
-        const content = Buffer.from(raw).toString('utf8').trim();
-        this.log.appendLine(`[detector] HEAD content: "${content}"`);
-        const match = content.match(/^ref: refs\/heads\/(.+)$/);
-        if (!match) return; // detached HEAD
-        this.fire(match[1], folder.uri.fsPath);
-      } catch (e) {
-        this.log.appendLine(`[detector] HEAD read error: ${e}`);
-      }
+    let debounce: NodeJS.Timeout | undefined;
+
+    const onHeadChange = (uri: vscode.Uri) => {
+      // Debounce: git may fire multiple fs events for a single checkout
+      clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        this.log.appendLine(`[detector] .git/HEAD changed: ${uri.fsPath}`);
+        try {
+          const raw = await vscode.workspace.fs.readFile(uri);
+          const content = Buffer.from(raw).toString('utf8').trim();
+          this.log.appendLine(`[detector] HEAD content: "${content}"`);
+          const match = content.match(/^ref: refs\/heads\/(.+)$/);
+          if (!match) return; // detached HEAD
+          this.fire(match[1], folder.uri.fsPath);
+        } catch (e) {
+          this.log.appendLine(`[detector] HEAD read error: ${e}`);
+        }
+      }, 50);
     };
 
     this._disposables.push(watcher.onDidChange(onHeadChange));

@@ -5,38 +5,9 @@ import { Rarity } from './types';
 // needing -e or $'...' shell quoting tricks.
 const R = '\\033[0m';
 const BANNERS: Record<Exclude<Rarity, 'common'>, (name: string) => string> = {
-  uncommon: (name) => {
-    const c = '\\033[38;5;40m';
-    const pad = name.substring(0, 28).padEnd(28);
-    return [
-      `${c}  ╔══════════════════════════════╗`,
-      `  ║  ✦ UNCOMMON BRANCH FOUND ✦   ║`,
-      `  ║  ${pad}║`,
-      `  ╚══════════════════════════════╝${R}`,
-    ].join('\\n');
-  },
-
-  rare: (name) => {
-    const c = '\\033[1m\\033[38;5;33m';
-    const pad = name.substring(0, 28).padEnd(28);
-    return [
-      `${c}  ╔══════════════════════════════╗`,
-      `  ║   ★★  RARE BRANCH FOUND  ★★   ║`,
-      `  ║  ${pad}║`,
-      `  ╚══════════════════════════════╝${R}`,
-    ].join('\\n');
-  },
-
-  legendary: (name) => {
-    const c = '\\033[1m\\033[38;5;214m';
-    const pad = name.substring(0, 32).padEnd(32);
-    return [
-      `${c}  ╔══════════════════════════════════╗`,
-      `  ║  🔥 LEGENDARY BRANCH FOUND 🔥    ║`,
-      `  ║  ${pad}║`,
-      `  ╚══════════════════════════════════╝${R}`,
-    ].join('\\n');
-  },
+  uncommon: (name) => `\\033[38;5;40m✦ Uncommon branch: ${name}${R}`,
+  rare:     (name) => `\\033[1m\\033[38;5;33m★★ Rare branch: ${name}${R}`,
+  legendary:(name) => `\\033[1m\\033[38;5;214m🔥 LEGENDARY branch: ${name}${R}`,
 };
 
 export function sendBannerToTerminal(branchName: string, rarity: Rarity): void {
