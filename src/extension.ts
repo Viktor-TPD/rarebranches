@@ -13,6 +13,10 @@ export function activate(context: vscode.ExtensionContext): void {
 
   detector.onNewBranch(event => {
     const { record, isNew } = getOrAssignRarity(event.branchName, context.globalState);
+
+    // Common branches are silent — no banner, no notification, no status bar
+    if (record.rarity === 'common') return;
+
     const config = vscode.workspace.getConfiguration('branchRarity');
 
     if (config.get<boolean>('showStatusBar', true)) {
@@ -22,7 +26,6 @@ export function activate(context: vscode.ExtensionContext): void {
     if (isNew) {
       sendBannerToTerminal(event.branchName, record.rarity);
 
-      // Notifications for uncommon and above
       const name = event.branchName;
       switch (record.rarity) {
         case 'uncommon':

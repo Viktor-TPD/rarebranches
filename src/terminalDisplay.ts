@@ -1,61 +1,55 @@
 import * as vscode from 'vscode';
 import { Rarity } from './types';
 
-const RESET = '\x1b[0m';
-
-// Each builder returns lines joined with \n — we'll printf the whole thing
-const BANNERS: Record<Rarity, (name: string) => string> = {
-  common: (name) =>
-    `\x1b[38;5;245m  [branch-rarity] ${name} — Common${RESET}`,
-
+// Use \033 octal escapes — printf interprets these natively without
+// needing -e or $'...' shell quoting tricks.
+const R = '\\033[0m';
+const BANNERS: Record<Exclude<Rarity, 'common'>, (name: string) => string> = {
   uncommon: (name) => {
-    const c = '\x1b[38;5;40m';
+    const c = '\\033[38;5;40m';
     const pad = name.substring(0, 28).padEnd(28);
     return [
       `${c}  ╔══════════════════════════════╗`,
       `  ║  ✦ UNCOMMON BRANCH FOUND ✦   ║`,
       `  ║  ${pad}║`,
-      `  ╚══════════════════════════════╝${RESET}`,
-    ].join('\n');
+      `  ╚══════════════════════════════╝${R}`,
+    ].join('\\n');
   },
 
   rare: (name) => {
-    const c = '\x1b[1m\x1b[38;5;33m';
+    const c = '\\033[1m\\033[38;5;33m';
     const pad = name.substring(0, 28).padEnd(28);
     return [
       `${c}  ╔══════════════════════════════╗`,
       `  ║   ★★  RARE BRANCH FOUND  ★★   ║`,
       `  ║  ${pad}║`,
-      `  ╚══════════════════════════════╝${RESET}`,
-    ].join('\n');
+      `  ╚══════════════════════════════╝${R}`,
+    ].join('\\n');
   },
 
   legendary: (name) => {
-    const c = '\x1b[1m\x1b[38;5;214m';
+    const c = '\\033[1m\\033[38;5;214m';
     const pad = name.substring(0, 32).padEnd(32);
     return [
       `${c}  ╔══════════════════════════════════╗`,
       `  ║  🔥 LEGENDARY BRANCH FOUND 🔥    ║`,
       `  ║  ${pad}║`,
-      `  ╚══════════════════════════════════╝${RESET}`,
-    ].join('\n');
+      `  ╚══════════════════════════════════╝${R}`,
+    ].join('\\n');
   },
 };
 
 export function sendBannerToTerminal(branchName: string, rarity: Rarity): void {
+  if (rarity === 'common') return;
+
   const config = vscode.workspace.getConfiguration('branchRarity');
   if (!config.get<boolean>('showTerminalBanner', true)) return;
 
   const terminal = vscode.window.activeTerminal;
   if (!terminal) return;
 
-  const banner = BANNERS[rarity](branchName);
-
-  // Escape backslashes and double-quotes for the shell string,
-  // then use printf to render ANSI codes without executing them as commands.
-  const escaped = banner
-    .replace(/\\/g, '\\\\')
-    .replace(/"/g, '\\"');
-
-  terminal.sendText(`printf "${escaped}\\n"`, true);
+  // printf interprets \033 and \n natively — no shell escaping needed for ANSI.
+  // We only need to escape single-quotes in the branch name itself.
+  const banner = BANNERS[rarity](branchName).replace(/'/g, "'\\''");
+  terminal.sendText(`printf '${banner}\\n'`, true);
 }
