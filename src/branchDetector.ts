@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { GitExtensionAPI, GitRepository, NewBranchEvent } from './types';
+import { NewBranchEvent } from './types';
 
 export class BranchDetector implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
@@ -7,9 +7,7 @@ export class BranchDetector implements vscode.Disposable {
   readonly onNewBranch = this._onNewBranch.event;
   readonly log: vscode.OutputChannel;
 
-  // Tracks last-seen branch per repo root — used by both strategies for dedup
   private _lastBranchPerRepo = new Map<string, string | undefined>();
-  // Tracks which workspace folders already have a HEAD watcher
   private _watchedFolders = new Set<string>();
 
   constructor(log: vscode.OutputChannel) {
@@ -24,58 +22,6 @@ export class BranchDetector implements vscode.Disposable {
     this._onNewBranch.fire({ branchName, repoRoot });
   }
 
-  // Strategy A: Git extension API — catches VSCode-initiated git operations
-  private setupGitApiWatcher(): void {
-    const gitExtension = vscode.extensions.getExtension('vscode.git');
-    if (!gitExtension) {
-      this.log.appendLine('[detector] vscode.git extension not found');
-      return;
-    }
-
-    const initApi = () => {
-      if (!gitExtension.isActive) {
-        this.log.appendLine('[detector] vscode.git not active after activate()');
-        return;
-      }
-      const api: GitExtensionAPI = gitExtension.exports.getAPI(1);
-      this.log.appendLine(`[detector] Git API ready, ${api.repositories.length} repo(s)`);
-
-      for (const repo of api.repositories) {
-        this.subscribeToRepo(repo);
-      }
-      this._disposables.push(
-        api.onDidOpenRepository(repo => {
-          this.log.appendLine(`[detector] new repo opened: ${repo.rootUri.fsPath}`);
-          this.subscribeToRepo(repo);
-        })
-      );
-    };
-
-    if (gitExtension.isActive) {
-      initApi();
-    } else {
-      this.log.appendLine('[detector] activating vscode.git...');
-      gitExtension.activate().then(initApi);
-    }
-  }
-
-  private subscribeToRepo(repo: GitRepository): void {
-    const repoRoot = repo.rootUri.fsPath;
-    this._lastBranchPerRepo.set(repoRoot, repo.state.HEAD?.name);
-    this.log.appendLine(`[detector] subscribed to repo: ${repoRoot} (HEAD: ${repo.state.HEAD?.name ?? 'none'})`);
-
-    this._disposables.push(
-      repo.onDidCheckout(() => {
-        this.log.appendLine(`[detector] onDidCheckout fired for ${repoRoot}`);
-        const currentBranch = repo.state.HEAD?.name;
-        if (currentBranch) {
-          this.fire(currentBranch, repoRoot);
-        }
-      })
-    );
-  }
-
-  // Strategy B: .git/HEAD file watcher — catches external git commands
   private watchFolder(folder: vscode.WorkspaceFolder): void {
     if (this._watchedFolders.has(folder.uri.fsPath)) return;
     this._watchedFolders.add(folder.uri.fsPath);
@@ -123,7 +69,6 @@ export class BranchDetector implements vscode.Disposable {
 
   activate(): void {
     this.log.appendLine('[detector] activating...');
-    this.setupGitApiWatcher();
     this.setupHeadFileWatcher();
   }
 

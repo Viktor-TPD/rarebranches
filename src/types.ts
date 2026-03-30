@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary';
 
 export interface BranchRecord {
@@ -19,23 +17,3 @@ export interface RarityStyle {
   ansiCode: string;
 }
 
-// Minimal surface of VSCode's Git extension API v1
-export interface GitExtensionAPI {
-  readonly repositories: GitRepository[];
-  onDidOpenRepository: vscode.Event<GitRepository>;
-}
-
-export interface GitRepository {
-  readonly rootUri: vscode.Uri;
-  readonly state: GitRepositoryState;
-  readonly onDidCommit: vscode.Event<void>;
-  readonly onDidCheckout: vscode.Event<void>;
-}
-
-export interface GitRepositoryState {
-  readonly HEAD: GitBranch | undefined;
-}
-
-export interface GitBranch {
-  readonly name?: string;
-}
