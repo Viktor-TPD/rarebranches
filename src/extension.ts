@@ -14,10 +14,14 @@ export function activate(context: vscode.ExtensionContext): void {
   detector.onNewBranch(event => {
     const { record, isNew } = getOrAssignRarity(event.branchName, context.globalState);
 
-    // Common branches are silent
-    if (record.rarity === 'common') return;
-
     const config = vscode.workspace.getConfiguration('branchRarity');
+
+    if (record.rarity === 'common') {
+      if (config.get<boolean>('showStatusBar', true)) {
+        statusBar.hide();
+      }
+      return;
+    }
 
     if (config.get<boolean>('showStatusBar', true)) {
       statusBar.update(event.branchName, record.rarity, isNew);

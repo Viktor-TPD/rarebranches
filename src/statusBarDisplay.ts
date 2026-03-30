@@ -29,6 +29,10 @@ export class StatusBarDisplay implements vscode.Disposable {
     this._item.show();
   }
 
+  hide(): void {
+    this._item.hide();
+  }
+
   dispose(): void {
     this._item.dispose();
   }
