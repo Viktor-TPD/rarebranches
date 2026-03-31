@@ -76,6 +76,21 @@ export class BranchDetector implements vscode.Disposable {
   activate(): void {
     this.log.appendLine('[detector] activating...');
     this.setupHeadFileWatcher();
+    this.checkCurrentBranches();
+  }
+
+  private checkCurrentBranches(): void {
+    const folders = vscode.workspace.workspaceFolders ?? [];
+    for (const folder of folders) {
+      const headUri = vscode.Uri.joinPath(folder.uri, '.git', 'HEAD');
+      vscode.workspace.fs.readFile(headUri).then(raw => {
+        const content = Buffer.from(raw).toString('utf8').trim();
+        const match = content.match(/^ref: refs\/heads\/(.+)$/);
+        if (!match) return;
+        this.log.appendLine(`[detector] initial branch: "${match[1]}" in ${folder.uri.fsPath}`);
+        this.fire(match[1], folder.uri.fsPath);
+      }, () => { /* not a git repo */ });
+    }
   }
 
   dispose(): void {
