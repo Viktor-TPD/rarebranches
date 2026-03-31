@@ -1,6 +1,6 @@
 # Branch Rarity
 
-Does it feel dull to start a new task? Not anymore: every new branch opened is an exciting adventure! Will you be the happy owner of a GOLDEN LEGENDARY BRANCH?
+Does it feel dull to start a new task? Not anymore: every new branch opened presents an opportunity for an exciting adventure! Will you be the happy owner of a GOLDEN LEGENDARY BRANCH?
 
 ## How it works
 

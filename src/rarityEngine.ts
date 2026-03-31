@@ -3,24 +3,6 @@ import { Rarity, Modifier, BranchRecord, RarityStyle } from "./types";
 
 const STATE_KEY = "branchRarity.knownBranches";
 
-// Test fixtures — branches that always get a fixed rarity+modifier (never persisted, always re-shows gacha)
-const TEST_BRANCHES: Record<string, { rarity: Rarity; modifier?: Modifier }> = {
-  'test/uncommon':        { rarity: 'uncommon' },
-  'test/uncommon-glass':  { rarity: 'uncommon', modifier: 'glass' },
-  'test/uncommon-dark':   { rarity: 'uncommon', modifier: 'dark' },
-  'test/uncommon-foiled': { rarity: 'uncommon', modifier: 'foiled' },
-  'test/rare':            { rarity: 'rare' },
-  'test/rare-glass':      { rarity: 'rare', modifier: 'glass' },
-  'test/rare-dark':       { rarity: 'rare', modifier: 'dark' },
-  'test/rare-foiled':     { rarity: 'rare', modifier: 'foiled' },
-  'test/legendary':       { rarity: 'legendary' },
-  'test/legendary-glass': { rarity: 'legendary', modifier: 'glass' },
-  'test/legendary-dark':  { rarity: 'legendary', modifier: 'dark' },
-  'test/legendary-foiled':{ rarity: 'legendary', modifier: 'foiled' },
-  'test/uncommon-gold':   { rarity: 'uncommon', modifier: 'gold' },
-  'test/rare-gold':       { rarity: 'rare', modifier: 'gold' },
-  'test/legendary-gold':  { rarity: 'legendary', modifier: 'gold' },
-};
 
 export function rollModifier(): Modifier | undefined {
   const roll = Math.random();
@@ -51,12 +33,6 @@ export function getOrAssignRarity(
   repoRoot: string,
   state: vscode.Memento,
 ): { record: BranchRecord; isNew: boolean } {
-  // Test fixture — always fires gacha, never persisted
-  const fixture = TEST_BRANCHES[branchName];
-  if (fixture) {
-    return { record: { ...fixture, discoveredAt: Date.now() }, isNew: true };
-  }
-
   const key = `${repoRoot}::${branchName}`;
   const map: Record<string, BranchRecord> = state.get(STATE_KEY, {});
   const existing = map[key];

@@ -1,13 +1,20 @@
 {
   "name": "branch-rarity",
   "displayName": "Branch Rarity",
-  "description": "Assigns a rarity tier to new git branches — like loot drops",
+  "description": "Every new git branch is a loot drop. Will you pull a GOLDEN LEGENDARY BRANCH?",
   "version": "0.1.0",
-  "publisher": "branch-rarity",
+  "publisher": "ViktorTohverStridh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Viktor-TPD/rarebranches"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -17,22 +24,38 @@
       {
         "id": "branchRarity.common",
         "description": "Color for Common rarity branches",
-        "defaults": { "dark": "#9E9E9E", "light": "#757575", "highContrast": "#FFFFFF" }
+        "defaults": {
+          "dark": "#9E9E9E",
+          "light": "#757575",
+          "highContrast": "#FFFFFF"
+        }
       },
       {
         "id": "branchRarity.uncommon",
         "description": "Color for Uncommon rarity branches",
-        "defaults": { "dark": "#4CAF50", "light": "#2E7D32", "highContrast": "#69FF47" }
+        "defaults": {
+          "dark": "#4CAF50",
+          "light": "#2E7D32",
+          "highContrast": "#69FF47"
+        }
       },
       {
         "id": "branchRarity.rare",
         "description": "Color for Rare rarity branches",
-        "defaults": { "dark": "#2196F3", "light": "#1565C0", "highContrast": "#47B4FF" }
+        "defaults": {
+          "dark": "#2196F3",
+          "light": "#1565C0",
+          "highContrast": "#47B4FF"
+        }
       },
       {
         "id": "branchRarity.legendary",
         "description": "Color for Legendary rarity branches",
-        "defaults": { "dark": "#FF9800", "light": "#E65100", "highContrast": "#FFD747" }
+        "defaults": {
+          "dark": "#FF9800",
+          "light": "#E65100",
+          "highContrast": "#FFD747"
+        }
       }
     ],
     "commands": [
