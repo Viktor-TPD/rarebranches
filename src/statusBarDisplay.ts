@@ -1,14 +1,17 @@
-import * as vscode from 'vscode';
-import { Rarity, Modifier } from './types';
-import { RARITY_STYLES, buildLabel } from './rarityEngine';
+import * as vscode from "vscode";
+import { Rarity, Modifier } from "./types";
+import { RARITY_STYLES, buildLabel } from "./rarityEngine";
 
 function hslToHex(h: number, s: number, l: number): string {
-  s /= 100; l /= 100;
+  s /= 100;
+  l /= 100;
   const a = s * Math.min(l, 1 - l);
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
     const color = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-    return Math.round(255 * color).toString(16).padStart(2, '0');
+    return Math.round(255 * color)
+      .toString(16)
+      .padStart(2, "0");
   };
   return `#${f(0)}${f(8)}${f(4)}`;
 }
@@ -20,31 +23,35 @@ export class StatusBarDisplay implements vscode.Disposable {
 
   constructor() {
     this._item = vscode.window.createStatusBarItem(
-      'branchRarity.badge',
+      "branchRarity.badge",
       vscode.StatusBarAlignment.Left,
-      100
+      100,
     );
-    this._item.name = 'Branch Rarity Badge';
+    this._item.name = "Branch Rarity Badge";
   }
 
-  update(branchName: string, rarity: Rarity, isNew: boolean, modifier?: Modifier): void {
+  update(
+    branchName: string,
+    rarity: Rarity,
+    isNew: boolean,
+    modifier?: Modifier,
+  ): void {
     this._stopFoil();
 
     const style = RARITY_STYLES[rarity];
     const label = buildLabel(rarity, modifier);
-    const newTag = isNew ? ' ✨' : '';
-    this._item.text = `${style.icon} ${branchName} [${label}${newTag}]`;
+    this._item.text = `${style.icon} ${branchName} [${label}]`;
     this._item.tooltip = isNew
       ? `New branch discovered! Rarity: ${label}`
       : `Branch rarity: ${label}`;
     this._item.backgroundColor =
-      rarity === 'legendary' && modifier !== 'foiled' && modifier !== 'gold'
-        ? new vscode.ThemeColor('statusBarItem.warningBackground')
+      rarity === "legendary" && modifier !== "foiled" && modifier !== "gold"
+        ? new vscode.ThemeColor("statusBarItem.warningBackground")
         : undefined;
 
-    if (modifier === 'gold') {
-      this._item.color = '#FFD700';
-    } else if (modifier === 'foiled') {
+    if (modifier === "gold") {
+      this._item.color = "#FFD700";
+    } else if (modifier === "foiled") {
       this._startFoil();
     } else {
       this._item.color = new vscode.ThemeColor(style.themeColorId);

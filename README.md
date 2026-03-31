@@ -1,27 +1,19 @@
 # Branch Rarity
 
-A VSCode extension that assigns a rarity tier to new git branches — like loot drops.
+Does it feel dull to start a new task? Not anymore: every new branch opened is an exciting adventure! Will you be the happy owner of a GOLDEN LEGENDARY BRANCH?
 
 ## How it works
 
-When you checkout a branch for the first time, a gacha reveal screen animates open showing the branch's rarity. Rarity is assigned once and persisted across sessions.
+When you checkout a branch for the first time, a gacha reveal screen animates open showing the branch's rarity. Rarity is assigned once and persists across sessions.
 
-| Tier      | Chance | Color  |
-|-----------|--------|--------|
-| Legendary | ~10%   | Gold   |
-| Rare      | ~10%   | Blue   |
-| Uncommon  | ~13%   | Green  |
-| Common    | ~67%   | —      |
+| Tier      | Chance | Color |
+| --------- | ------ | ----- |
+| Legendary | ~???%  | Gold  |
+| Rare      | ~10%   | Blue  |
+| Uncommon  | ~13%   | Green |
+| Common    | ~67%   | —     |
 
-Non-common branches can also roll a modifier (~10% each, mutually exclusive):
-
-| Modifier | Effect |
-|----------|--------|
-| Glass    | Frosted panel reveal, sparkle cross particles |
-| Dark     | Darkened colors, particles rain from the top |
-| Foiled   | Rainbow label, multicolor particles |
-
-The status bar shows the branch's rarity badge for all non-common branches.
+There's also branch modifiers: discover them all!
 
 ## Commands
 
@@ -29,9 +21,9 @@ The status bar shows the branch's rarity badge for all non-common branches.
 
 ## Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `branchRarity.showStatusBar` | `true` | Show rarity badge in the status bar |
+| Setting                      | Default | Description                         |
+| ---------------------------- | ------- | ----------------------------------- |
+| `branchRarity.showStatusBar` | `true`  | Show rarity badge in the status bar |
 
 ## Building
 
@@ -57,6 +49,7 @@ test/uncommon          test/rare          test/legendary
 test/uncommon-glass    test/rare-glass    test/legendary-glass
 test/uncommon-dark     test/rare-dark     test/legendary-dark
 test/uncommon-foiled   test/rare-foiled   test/legendary-foiled
+test/uncommon-gold     test/rare-gold     test/legendary-gold
 ```
 
 Switch back and forth freely — no need to run Clear All Records.
