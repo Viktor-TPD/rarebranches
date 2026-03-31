@@ -25,12 +25,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const updateStatusBar = () => {
       if (config.get<boolean>('showStatusBar', true)) {
-        statusBar.update(event.branchName, record.rarity, isNew);
+        statusBar.update(event.branchName, record.rarity, isNew, record.modifier);
       }
     };
 
     if (isNew) {
-      showGachaScreen(event.branchName, record.rarity, updateStatusBar);
+      showGachaScreen(event.branchName, record.rarity, record.modifier, updateStatusBar);
     } else {
       updateStatusBar();
     }
