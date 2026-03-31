@@ -4,6 +4,7 @@
   "description": "Every new git branch is a loot drop. Will you pull a GOLDEN LEGENDARY BRANCH?",
   "version": "0.1.0",
   "publisher": "ViktorTohverStridh",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Viktor-TPD/rarebranches"
