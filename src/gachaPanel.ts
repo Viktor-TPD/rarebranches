@@ -17,7 +17,7 @@ export function showGachaScreen(branchName: string, rarity: Rarity): void {
 
   const panel = vscode.window.createWebviewPanel(
     'branchRarity.gacha',
-    'Branch Rarity',
+    `Wow! ${branchName}'s true nature is revealed!`,
     vscode.ViewColumn.Beside,
     { enableScripts: true }
   );
@@ -115,14 +115,14 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     z-index: 0;
   }
 
-  /* The orb — starts small, grows during suspense */
+  /* The orb — starts neutral, color revealed on burst */
   #orb {
     position: relative;
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fff 0%, ${cfg.color} 60%, #000 100%);
-    box-shadow: 0 0 40px ${cfg.glow}, 0 0 80px ${cfg.glow};
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #888 60%, #111 100%);
+    box-shadow: 0 0 40px rgba(180,180,180,0.4), 0 0 80px rgba(180,180,180,0.2);
     animation: pulse 1.2s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
@@ -199,8 +199,8 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
   }
 
   @keyframes pulse {
-    from { box-shadow: 0 0 30px ${cfg.glow}, 0 0 60px ${cfg.glow}; transform: scale(1); }
-    to   { box-shadow: 0 0 70px ${cfg.glow}, 0 0 140px ${cfg.glow}; transform: scale(1.07); }
+    from { box-shadow: 0 0 30px rgba(180,180,180,0.3), 0 0 60px rgba(180,180,180,0.15); transform: scale(1); }
+    to   { box-shadow: 0 0 70px rgba(180,180,180,0.5), 0 0 140px rgba(180,180,180,0.25); transform: scale(1.07); }
   }
 
   @keyframes shake {

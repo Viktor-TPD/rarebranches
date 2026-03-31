@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const detector = new BranchDetector(log);
 
   detector.onNewBranch(event => {
-    const { record, isNew } = getOrAssignRarity(event.branchName, context.globalState);
+    const { record, isNew } = getOrAssignRarity(event.branchName, event.repoRoot, context.globalState);
 
     const config = vscode.workspace.getConfiguration('branchRarity');
 

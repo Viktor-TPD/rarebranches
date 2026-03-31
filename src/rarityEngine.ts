@@ -13,10 +13,12 @@ export function rollRarity(): Rarity {
 
 export function getOrAssignRarity(
   branchName: string,
+  repoRoot: string,
   state: vscode.Memento,
 ): { record: BranchRecord; isNew: boolean } {
+  const key = `${repoRoot}::${branchName}`;
   const map: Record<string, BranchRecord> = state.get(STATE_KEY, {});
-  const existing = map[branchName];
+  const existing = map[key];
   if (existing) {
     return { record: existing, isNew: false };
   }
@@ -24,7 +26,7 @@ export function getOrAssignRarity(
     rarity: rollRarity(),
     discoveredAt: Date.now(),
   };
-  map[branchName] = record;
+  map[key] = record;
   state.update(STATE_KEY, map);
   return { record, isNew: true };
 }
