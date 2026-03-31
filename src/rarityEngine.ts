@@ -6,10 +6,10 @@ const STATE_KEY = "branchRarity.knownBranches";
 
 export function rollModifier(): Modifier | undefined {
   const roll = Math.random();
-  if (roll < 0.10) return 'glass';
-  if (roll < 0.20) return 'dark';
-  if (roll < 0.30) return 'foiled';
-  if (roll < 0.40) return 'gold';
+  if (roll < 0.05) return 'glass';
+  if (roll < 0.10) return 'dark';
+  if (roll < 0.15) return 'foiled';
+  if (roll < 0.20) return 'gold';
   return undefined;
 }
 
@@ -22,9 +22,9 @@ export function buildLabel(rarity: Rarity, modifier?: Modifier): string {
 
 export function rollRarity(): Rarity {
   const roll = Math.random();
-  if (roll < 1 / 10) return "legendary";
-  if (roll < 1 / 5) return "rare";
-  if (roll < 1 / 3) return "uncommon";
+  if (roll < 0.01) return "legendary";
+  if (roll < 0.06) return "rare";
+  if (roll < 0.21) return "uncommon";
   return "common";
 }
 

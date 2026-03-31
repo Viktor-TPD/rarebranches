@@ -9,11 +9,11 @@ When you checkout a branch for the first time, a gacha reveal screen animates op
 | Tier      | Chance | Color |
 | --------- | ------ | ----- |
 | Legendary | ~???%  | Gold  |
-| Rare      | ~10%   | Blue  |
-| Uncommon  | ~13%   | Green |
+| Rare      | ~5%    | Blue  |
+| Uncommon  | ~15%   | Green |
 | Common    | ~67%   | —     |
 
-There's also branch modifiers: discover them all!
+There's also branch modifiers — discover them all!
 
 ## Commands
 
@@ -33,23 +33,3 @@ npm run compile   # bundle via esbuild
 npm run lint      # type-check only (tsc --noEmit)
 npm run package   # produce .vsix
 ```
-
-## Publishing
-
-> **Before publishing**, remove the test fixture map in `src/rarityEngine.ts`.
->
-> Find the `TEST_BRANCHES` constant near the top of the file and delete it along with the fixture check at the start of `getOrAssignRarity`. These branches always trigger a fresh gacha and are never persisted — useful for development, but not something end users should hit accidentally.
-
-## Testing locally
-
-Press `F5` to open an Extension Development Host. The following branch names are hardwired to fixed rarity+modifier combos and always show the gacha (even if you've checked them out before):
-
-```
-test/uncommon          test/rare          test/legendary
-test/uncommon-glass    test/rare-glass    test/legendary-glass
-test/uncommon-dark     test/rare-dark     test/legendary-dark
-test/uncommon-foiled   test/rare-foiled   test/legendary-foiled
-test/uncommon-gold     test/rare-gold     test/legendary-gold
-```
-
-Switch back and forth freely — no need to run Clear All Records.
