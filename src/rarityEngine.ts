@@ -38,24 +38,20 @@ export const RARITY_STYLES: Record<Rarity, RarityStyle> = {
     label: "Common",
     icon: "$(git-branch)",
     themeColorId: "branchRarity.common",
-    ansiCode: "\x1b[38;5;245m",
   },
   uncommon: {
     label: "Uncommon",
     icon: "$(sparkle)",
     themeColorId: "branchRarity.uncommon",
-    ansiCode: "\x1b[38;5;40m",
   },
   rare: {
     label: "Rare",
     icon: "$(star-full)",
     themeColorId: "branchRarity.rare",
-    ansiCode: "\x1b[1m\x1b[38;5;33m",
   },
   legendary: {
     label: "LEGENDARY",
     icon: "$(flame)",
     themeColorId: "branchRarity.legendary",
-    ansiCode: "\x1b[1m\x1b[38;5;214m",
   },
 };

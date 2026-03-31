@@ -14,6 +14,5 @@ export interface RarityStyle {
   label: string;
   icon: string;
   themeColorId: string;
-  ansiCode: string;
 }
 

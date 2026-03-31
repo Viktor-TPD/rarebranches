@@ -44,11 +44,6 @@
     "configuration": {
       "title": "Branch Rarity",
       "properties": {
-        "branchRarity.showTerminalBanner": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show a styled ANSI banner in the active terminal when a new branch is discovered"
-        },
         "branchRarity.showStatusBar": {
           "type": "boolean",
           "default": true,
