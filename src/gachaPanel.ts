@@ -120,7 +120,7 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #fff 0%, #e05050 60%, #111 100%);
     box-shadow: 0 0 40px rgba(220,80,80,0.5), 0 0 80px rgba(220,80,80,0.25);
-    animation: pulse 1.2s ease-in-out infinite alternate, rainbow 3s linear infinite;
+    animation: orbFadeIn 0.8s ease-out forwards, pulse 1.2s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,6 +187,11 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
 
   #dismiss:hover {
     background: ${cfg.color}22;
+  }
+
+  @keyframes orbFadeIn {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: scale(1); }
   }
 
   @keyframes pulse {
@@ -313,30 +318,55 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
 
   dismiss.addEventListener('click', () => vscode.postMessage({ type: 'close' }));
 
-  // Phase 1 (1s): faster pulse, orb grows
-  setTimeout(() => {
-    orb.style.animation = 'pulse 0.4s ease-in-out infinite alternate, rainbow 3s linear infinite';
-    orb.style.width = '160px';
-    orb.style.height = '160px';
-    orb.style.transition = 'width 0.8s ease, height 0.8s ease';
-  }, 1000);
+  // Continuously drive hue and orb size on an easing curve over 5 seconds
+  const BURST_AT = 5000;
+  const startTime = performance.now();
+  let hue = 0;
+  let burst = false;
 
-  // Phase 2 (3s): violent shake, rainbow speeds up
-  setTimeout(() => {
-    orb.style.animation = 'shake 0.08s linear infinite, rainbow 0.8s linear infinite';
-    orb.style.filter = 'brightness(2)';
-  }, 3000);
+  function animateOrb(now) {
+    if (burst) return;
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / BURST_AT, 1); // 0 → 1 over 5s
 
-  // Phase 3 (4s): shake harder, rainbow even faster
-  setTimeout(() => {
-    orb.style.animation = 'shake 0.08s linear infinite, rainbow 0.3s linear infinite';
-    orb.style.filter = 'brightness(3)';
-    orb.style.width = '180px';
-    orb.style.height = '180px';
-  }, 4000);
+    // Exponential ease: visibly moving from frame 1, explosive at the end
+    // t=0 → eased=0, t=1 → eased=1, but with steep acceleration
+    const eased = t === 0 ? 0 : Math.pow(2, 10 * t - 10);
 
-  // Phase 4 (5s): BURST
-  setTimeout(() => {
+    // Hue speed: ~60deg/s at start, clamped at 75% of original ceiling
+    const degPerMs = Math.min(0.06 + eased * 3, 2.25);
+    hue += degPerMs * (now - (animateOrb.last || now));
+    animateOrb.last = now;
+
+    // Size grows from 140 → 185px on the same curve
+    const size = 140 + eased * 45;
+    orb.style.width = size + 'px';
+    orb.style.height = size + 'px';
+
+    // Brightness ramps 1 → 4
+    const brightness = 1 + eased * 3;
+
+    // Switch from pulse to shake when eased > 0.35
+    const shakeSpeed = eased > 0.35 ? '0.08s' : null;
+    if (shakeSpeed && !orb.dataset.shaking) {
+      orb.dataset.shaking = '1';
+      orb.style.animation = 'shake 0.08s linear infinite';
+    }
+
+    orb.style.filter = 'hue-rotate(' + (hue % 360) + 'deg) brightness(' + brightness.toFixed(2) + ')';
+
+    if (t < 1) {
+      requestAnimationFrame(animateOrb);
+    } else {
+      doBurst();
+    }
+  }
+  animateOrb.last = null;
+  requestAnimationFrame(animateOrb);
+
+  function doBurst() {
+    burst = true;
+
     if (doFlash) {
       flash.style.transition = 'opacity 0.06s';
       flash.style.opacity = '1';
@@ -355,11 +385,8 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
       setTimeout(() => { document.body.style.animation = ''; }, 500);
     }
 
-    // Remove orb from layout after burst completes
     setTimeout(() => {
       orb.remove();
-
-      // Reveal floats in
       reveal.classList.add('show');
       setTimeout(() => {
         reveal.classList.remove('show');
@@ -368,7 +395,7 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
         dismiss.classList.add('show');
       }, 500);
     }, 400);
-  }, 5000);
+  }
 </script>
 </body>
 </html>`;
