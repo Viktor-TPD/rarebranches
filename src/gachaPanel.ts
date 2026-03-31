@@ -7,7 +7,7 @@ const HIT_FILE = '/tmp/branch-rarity-hit';
 let currentPanel: vscode.WebviewPanel | undefined;
 let closeTimeout: NodeJS.Timeout | undefined;
 
-export function showGachaScreen(branchName: string, rarity: Rarity): void {
+export function showGachaScreen(branchName: string, rarity: Rarity, onReveal: () => void): void {
   // Dispose any existing panel
   if (currentPanel) {
     clearTimeout(closeTimeout);
@@ -32,6 +32,7 @@ export function showGachaScreen(branchName: string, rarity: Rarity): void {
     clearTimeout(closeTimeout);
     currentPanel = undefined;
     try { fs.unlinkSync(HIT_FILE); } catch {}
+    onReveal();
   });
 
   // Webview signals close (button click or animation end)
@@ -45,32 +46,28 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     color: string;
     glow: string;
     label: string;
-    emoji: string;
     particleCount: number;
     flash: boolean;
   }> = {
     uncommon: {
       color: '#4CAF50',
       glow: 'rgba(76,175,80,0.6)',
-      label: 'UNCOMMON',
-      emoji: '✦',
-      particleCount: 30,
+      label: 'UNCOMMON BRANCH',
+      particleCount: 40,
       flash: false,
     },
     rare: {
       color: '#2196F3',
       glow: 'rgba(33,150,243,0.6)',
-      label: 'RARE',
-      emoji: '★',
-      particleCount: 50,
+      label: 'RARE BRANCH',
+      particleCount: 80,
       flash: false,
     },
     legendary: {
       color: '#FF9800',
       glow: 'rgba(255,152,0,0.8)',
-      label: 'LEGENDARY',
-      emoji: '🔥',
-      particleCount: 100,
+      label: 'LEGENDARY BRANCH',
+      particleCount: 150,
       flash: true,
     },
   };
@@ -115,15 +112,15 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     z-index: 0;
   }
 
-  /* The orb — starts neutral, color revealed on burst */
+  /* The orb — rainbow hue cycles during suspense, color revealed on burst */
   #orb {
     position: relative;
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #fff 0%, #888 60%, #111 100%);
-    box-shadow: 0 0 40px rgba(180,180,180,0.4), 0 0 80px rgba(180,180,180,0.2);
-    animation: pulse 1.2s ease-in-out infinite alternate;
+    background: radial-gradient(circle at 35% 35%, #fff 0%, #e05050 60%, #111 100%);
+    box-shadow: 0 0 40px rgba(220,80,80,0.5), 0 0 80px rgba(220,80,80,0.25);
+    animation: pulse 1.2s ease-in-out infinite alternate, rainbow 3s linear infinite;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,12 +165,6 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     line-height: 1.3;
   }
 
-  #emoji {
-    font-size: 36px;
-    margin-bottom: 12px;
-    display: block;
-  }
-
   /* Dismiss button — hidden until reveal */
   #dismiss {
     margin-top: 36px;
@@ -199,8 +190,26 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
   }
 
   @keyframes pulse {
-    from { box-shadow: 0 0 30px rgba(180,180,180,0.3), 0 0 60px rgba(180,180,180,0.15); transform: scale(1); }
-    to   { box-shadow: 0 0 70px rgba(180,180,180,0.5), 0 0 140px rgba(180,180,180,0.25); transform: scale(1.07); }
+    from { transform: scale(1); }
+    to   { transform: scale(1.07); }
+  }
+
+  @keyframes rainbow {
+    0%   { filter: hue-rotate(0deg)   brightness(1.2); }
+    100% { filter: hue-rotate(360deg) brightness(1.2); }
+  }
+
+  @keyframes screenshake {
+    0%,100% { transform: translate(0, 0); }
+    10%     { transform: translate(-8px, -4px); }
+    20%     { transform: translate(8px, 4px); }
+    30%     { transform: translate(-6px, 6px); }
+    40%     { transform: translate(6px, -6px); }
+    50%     { transform: translate(-10px, 2px); }
+    60%     { transform: translate(10px, -2px); }
+    70%     { transform: translate(-4px, -8px); }
+    80%     { transform: translate(4px, 8px); }
+    90%     { transform: translate(-6px, -4px); }
   }
 
   @keyframes shake {
@@ -235,7 +244,6 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
 <div id="orb"></div>
 
 <div id="reveal">
-  <span id="emoji">${cfg.emoji}</span>
   <div id="rarity-label">${cfg.label}</div>
   <div id="branch-name">${safeName}</div>
 </div>
@@ -305,22 +313,23 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
 
   dismiss.addEventListener('click', () => vscode.postMessage({ type: 'close' }));
 
-  // Phase 1 (0–1s): slow suspenseful pulse
+  // Phase 1 (1s): faster pulse, orb grows
   setTimeout(() => {
-    orb.style.animation = 'pulse 0.4s ease-in-out infinite alternate';
+    orb.style.animation = 'pulse 0.4s ease-in-out infinite alternate, rainbow 3s linear infinite';
     orb.style.width = '160px';
     orb.style.height = '160px';
     orb.style.transition = 'width 0.8s ease, height 0.8s ease';
   }, 1000);
 
-  // Phase 2 (3s): violent shake
+  // Phase 2 (3s): violent shake, rainbow speeds up
   setTimeout(() => {
-    orb.style.animation = 'shake 0.08s linear infinite';
+    orb.style.animation = 'shake 0.08s linear infinite, rainbow 0.8s linear infinite';
     orb.style.filter = 'brightness(2)';
   }, 3000);
 
-  // Phase 3 (4s): shake harder
+  // Phase 3 (4s): shake harder, rainbow even faster
   setTimeout(() => {
+    orb.style.animation = 'shake 0.08s linear infinite, rainbow 0.3s linear infinite';
     orb.style.filter = 'brightness(3)';
     orb.style.width = '180px';
     orb.style.height = '180px';
@@ -340,6 +349,11 @@ function getWebviewContent(branchName: string, rarity: Rarity): string {
     orb.style.animation = 'burst 0.4s ease-out forwards';
     orb.style.filter = 'brightness(1)';
     spawnParticles();
+
+    if (doFlash) {
+      document.body.style.animation = 'screenshake 0.5s ease-out';
+      setTimeout(() => { document.body.style.animation = ''; }, 500);
+    }
 
     // Remove orb from layout after burst completes
     setTimeout(() => {
