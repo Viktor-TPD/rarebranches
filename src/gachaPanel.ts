@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
+import * as crypto from "crypto";
 import { Rarity, Modifier } from "./types";
 
 const HIT_FILE = "/tmp/branch-rarity-hit";
@@ -28,7 +29,8 @@ export function showGachaScreen(
   );
 
   currentPanel = panel;
-  panel.webview.html = getWebviewContent(branchName, rarity, modifier);
+  const nonce = crypto.randomBytes(16).toString("base64");
+  panel.webview.html = getWebviewContent(nonce, branchName, rarity, modifier);
 
   // Signal the bash script that a gacha is active
   fs.writeFileSync(HIT_FILE, `${rarity}:${branchName}`);
@@ -71,6 +73,7 @@ function darkenRgba(rgba: string, amount: number): string {
 }
 
 function getWebviewContent(
+  nonce: string,
   branchName: string,
   rarity: Rarity,
   modifier: Modifier | undefined,
@@ -129,6 +132,7 @@ function getWebviewContent(
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline';">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -425,7 +429,7 @@ function getWebviewContent(
 
 <button id="dismiss">DISMISS</button>
 
-<script>
+<script nonce="${nonce}">
   const vscode = acquireVsCodeApi();
   const color = '${cfg.color}';
   const particleCount = ${cfg.particleCount};
