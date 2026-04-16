@@ -2,7 +2,7 @@
   "name": "branch-rarity",
   "displayName": "Branch Rarity",
   "description": "Every new git branch is a loot drop. Will you pull a GOLDEN LEGENDARY BRANCH?",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "ViktorTohverStridh",
   "icon": "icon.png",
   "repository": {
